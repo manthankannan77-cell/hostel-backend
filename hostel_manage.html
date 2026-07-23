@@ -1,0 +1,3997 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hostel — Management System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0d0f1a;
+        --surface: #141626;
+        --surface2: #1c1f35;
+        --border: rgba(255, 255, 255, 0.07);
+        --accent1: #ff6b35;
+        --accent2: #7c4dff;
+        --accent3: #00e5bd;
+        --accent4: #ffb800;
+        --text: #f0f2ff;
+        --muted: #7a7f9a;
+        --danger: #ff4757;
+        --success: #2ed573;
+        --card-radius: 16px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background:
+          radial-gradient(
+            ellipse at 20% 20%,
+            rgba(124, 77, 255, 0.08) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at 80% 80%,
+            rgba(255, 107, 53, 0.07) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at 50% 50%,
+            rgba(0, 229, 189, 0.04) 0%,
+            transparent 60%
+          );
+        pointer-events: none;
+        z-index: 0;
+        animation: bgPulse 8s ease-in-out infinite alternate;
+      }
+      @keyframes bgPulse {
+        0% {
+          transform: scale(1) rotate(0deg);
+        }
+        100% {
+          transform: scale(1.05) rotate(2deg);
+        }
+      }
+
+      .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 24px 16px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 100;
+        transition: transform 0.3s;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 8px 28px;
+      }
+      .logo-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .logo-text {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: -0.5px;
+      }
+      .logo-text span {
+        color: var(--accent1);
+      }
+      .nav-section {
+        margin-bottom: 8px;
+        padding: 0 8px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-top: 8px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--muted);
+        transition: all 0.2s;
+        margin-bottom: 2px;
+        border: 1px solid transparent;
+      }
+      .nav-item:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .nav-item.active {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 107, 53, 0.15),
+          rgba(124, 77, 255, 0.15)
+        );
+        color: var(--text);
+        border-color: rgba(255, 107, 53, 0.3);
+      }
+      .nav-item .icon {
+        width: 18px;
+        text-align: center;
+        font-size: 16px;
+      }
+      .nav-badge {
+        margin-left: auto;
+        background: var(--accent1);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 20px;
+      }
+      .sidebar-bottom {
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+
+      .main {
+        margin-left: 240px;
+        flex: 1;
+        padding: 28px 32px;
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        width: calc(100% - 240px);
+        max-width: 100%;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 32px;
+      }
+      .page-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 26px;
+        letter-spacing: -0.5px;
+      }
+      .page-title span {
+        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px;
+      }
+      .search-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .search-box input {
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-size: 13px;
+        width: 180px;
+        font-family: "DM Sans", sans-serif;
+      }
+      .search-box input::placeholder {
+        color: var(--muted);
+      }
+      .btn {
+        padding: 9px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        font-family: "DM Sans", sans-serif;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: #fff;
+      }
+      .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+      .btn-outline:hover {
+        background: var(--surface2);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .btn-danger {
+        background: rgba(255, 71, 87, 0.15);
+        color: var(--danger);
+        border: 1px solid rgba(255, 71, 87, 0.3);
+      }
+      .btn-success {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(46, 213, 115, 0.3);
+      }
+
+      .page {
+        display: none;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .page.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--card-radius);
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+      }
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        opacity: 0.12;
+        transform: translate(20px, -20px);
+      }
+      .stat-card:nth-child(1)::before {
+        background: var(--accent1);
+      }
+      .stat-card:nth-child(2)::before {
+        background: var(--accent2);
+      }
+      .stat-card:nth-child(3)::before {
+        background: var(--accent3);
+      }
+      .stat-card:nth-child(4)::before {
+        background: var(--accent4);
+      }
+      .stat-icon {
+        font-size: 24px;
+        margin-bottom: 12px;
+      }
+      .stat-value {
+        font-family: "Syne", sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .stat-change {
+        font-size: 12px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .stat-change.up {
+        color: var(--success);
+      }
+      .stat-change.down {
+        color: var(--danger);
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--card-radius);
+        padding: 22px;
+        width: 100%;
+        align-self: center;
+        justify-self: center;
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding: 22px;
+      }
+      .card-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 13px 14px;
+        font-size: 13.5px;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .badge-active {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--success);
+      }
+      .badge-pending {
+        background: rgba(255, 184, 0, 0.15);
+        color: var(--accent4);
+      }
+      .badge-inactive {
+        background: rgba(122, 127, 154, 0.15);
+        color: var(--muted);
+      }
+      .badge-paid {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--success);
+      }
+      .badge-unpaid {
+        background: rgba(255, 71, 87, 0.15);
+        color: var(--danger);
+      }
+      .badge-open {
+        background: rgba(255, 107, 53, 0.15);
+        color: var(--accent1);
+      }
+      .badge-resolved {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--success);
+      }
+      .badge-in-progress {
+        background: rgba(124, 77, 255, 0.15);
+        color: var(--accent2);
+      }
+      .badge-available {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--success);
+      }
+      .badge-occupied {
+        background: rgba(255, 107, 53, 0.15);
+        color: var(--accent1);
+      }
+      .badge-maintenance {
+        background: rgba(255, 184, 0, 0.15);
+        color: var(--accent4);
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .three-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .room-card {
+        border-radius: 12px;
+        padding: 16px 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+        position: relative;
+      }
+      .room-card:hover {
+        transform: scale(1.04);
+      }
+      .room-card.available {
+        background: rgba(46, 213, 115, 0.1);
+        border-color: rgba(46, 213, 115, 0.3);
+      }
+      .room-card.occupied {
+        background: rgba(255, 107, 53, 0.1);
+        border-color: rgba(255, 107, 53, 0.3);
+      }
+      .room-card.maintenance {
+        background: rgba(255, 184, 0, 0.1);
+        border-color: rgba(255, 184, 0, 0.3);
+      }
+      .room-num {
+        font-family: "Syne", sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+      }
+      .room-status {
+        font-size: 10px;
+        margin-top: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .room-card.available .room-status {
+        color: var(--success);
+      }
+      .room-card.occupied .room-status {
+        color: var(--accent1);
+      }
+      .room-card.maintenance .room-status {
+        color: var(--accent4);
+      }
+      .room-type {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        width: 90%;
+        max-width: 500px;
+        animation: slideUp 0.3s ease;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .modal-title {
+        font-family: "Syne", sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-close {
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 20px;
+        line-height: 1;
+      }
+      .modal-close:hover {
+        color: var(--text);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 2px;
+      }
+      .form-group.full {
+        grid-column: 1/-1;
+      }
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+      }
+      input,
+      select,
+      textarea {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 9px 12px;
+        color: var(--text);
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        outline: none;
+        transition: border 0.2s;
+        width: 100%;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--accent1);
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--muted);
+      }
+      select option {
+        background: var(--surface2);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .progress-bar {
+        height: 6px;
+        background: var(--surface2);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+      }
+
+      .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 100px;
+        padding-top: 8px;
+      }
+      .bar {
+        flex: 1;
+        border-radius: 4px 4px 0 0;
+        transition: height 0.5s ease;
+        cursor: pointer;
+      }
+      .bar:hover {
+        opacity: 0.8;
+      }
+      .chart-labels {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      .chart-label {
+        flex: 1;
+        text-align: center;
+        font-size: 10px;
+        color: var(--muted);
+      }
+
+      .alert {
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .alert-warning {
+        background: rgba(255, 184, 0, 0.1);
+        border: 1px solid rgba(255, 184, 0, 0.2);
+      }
+      .alert-info {
+        background: rgba(124, 77, 255, 0.1);
+        border: 1px solid rgba(124, 77, 255, 0.2);
+      }
+      .alert-icon {
+        font-size: 16px;
+        margin-top: 1px;
+      }
+      .alert-text {
+        font-size: 13px;
+      }
+      .alert-text strong {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .block-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .block-tab {
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: transparent;
+        transition: all 0.2s;
+        font-family: "DM Sans", sans-serif;
+      }
+      .block-tab.active {
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: #fff;
+        border-color: transparent;
+      }
+      .block-tab:hover:not(.active) {
+        background: var(--surface2);
+        color: var(--text);
+      }
+
+      .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .visitor-entry {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .visitor-entry:last-child {
+        border-bottom: none;
+      }
+      .visitor-info {
+        flex: 1;
+      }
+      .visitor-name {
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .visitor-meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .complaint-item {
+        padding: 14px;
+        border-radius: 12px;
+        background: var(--surface2);
+        margin-bottom: 10px;
+        border-left: 3px solid var(--accent1);
+      }
+      .complaint-item.resolved {
+        border-left-color: var(--success);
+      }
+      .complaint-item.in-progress {
+        border-left-color: var(--accent2);
+      }
+      .complaint-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 6px;
+      }
+      .complaint-title {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .complaint-meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 13px;
+        z-index: 9999;
+        transform: translateY(60px);
+        opacity: 0;
+        transition: all 0.3s;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast-icon {
+        font-size: 16px;
+      }
+
+      /* Loading spinner */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        color: var(--muted);
+      }
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent1);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin-right: 10px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Error state */
+      .error-state {
+        text-align: center;
+        padding: 32px;
+        color: var(--muted);
+      }
+      .error-state .error-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--surface2);
+        border-radius: 3px;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .main {
+          margin-left: 0;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .two-col,
+        .three-col,
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ========= LOGIN PAGE ========= */
+      #login-page {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      #login-page.hidden {
+        display: none;
+      }
+      .login-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+      }
+      .login-logo {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .login-logo .logo-icon {
+        font-size: 40px;
+      }
+      .login-logo .logo-text {
+        font-family: "Syne", sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        margin-top: 8px;
+      }
+      .login-logo .logo-text span {
+        color: var(--accent1);
+      }
+      .login-subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 4px;
+      }
+      .login-field {
+        margin-bottom: 16px;
+      }
+      .login-field label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+      .login-field input {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        font-size: 14px;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .login-field input:focus {
+        border-color: var(--accent2);
+      }
+      .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--accent2), var(--accent1));
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 8px;
+        transition: opacity 0.2s;
+      }
+      .login-btn:hover {
+        opacity: 0.9;
+      }
+      .login-error {
+        color: var(--danger);
+        font-size: 13px;
+        margin-top: 12px;
+        text-align: center;
+        min-height: 20px;
+      }
+      /* user info in sidebar */
+      .user-info {
+        padding: 12px 16px;
+        background: var(--surface2);
+        border-radius: 12px;
+        margin-bottom: 8px;
+      }
+      .user-info .u-name {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .user-info .u-role {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .role-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .role-badge.admin {
+        background: rgba(124, 77, 255, 0.2);
+        color: var(--accent2);
+      }
+      /* Users management page */
+      #page-users {
+        display: none;
+      }
+      #page-users.active {
+        display: block;
+      }
+      .admin-only {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN PAGE -->
+    <div id="login-page">
+      <div class="login-box">
+        <div class="login-logo">
+          <div class="logo-icon">🏠</div>
+          <div class="logo-text">Hostel<span>Pro</span></div>
+          <div class="login-subtitle">
+            Staff/Admin: use your password &nbsp;|&nbsp; Students: use your USN
+            as password
+          </div>
+        </div>
+        <div class="login-field">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="your@email.com" />
+        </div>
+        <div class="login-field">
+          <label>Password</label>
+          <input
+            type="password"
+            id="login-password"
+            placeholder="••••••••"
+            onkeydown="if (event.key === 'Enter') doLogin();"
+          />
+        </div>
+        <button class="login-btn" onclick="doLogin()">Sign In</button>
+        <div class="login-error" id="login-error"></div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Hostel<span>Pro</span></div>
+      </div>
+
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard', this)">
+        <span class="icon">📊</span> Dashboard
+      </div>
+
+      <div class="nav-section">Management</div>
+      <div class="nav-item" onclick="showPage('students', this)">
+        <span class="icon">👥</span> Students
+        <span class="nav-badge" id="students-badge">—</span>
+      </div>
+      <div class="nav-item" onclick="showPage('rooms', this)">
+        <span class="icon">🛏️</span> Rooms
+      </div>
+      <div class="nav-item" onclick="showPage('payments', this)">
+        <span class="icon">💳</span> Fee Payments
+        <span class="nav-badge" id="payments-badge">—</span>
+      </div>
+      <div class="nav-item" onclick="showPage('complaints', this)">
+        <span class="icon">📋</span> Complaints
+        <span class="nav-badge" id="complaints-badge">—</span>
+      </div>
+      <div class="nav-item" onclick="showPage('visitors', this)">
+        <span class="icon">🚶</span> Visitors
+      </div>
+      <div class="nav-item" onclick="showPage('staff', this)">
+        <span class="icon">👔</span> Staff
+      </div>
+      <div class="nav-item" onclick="showPage('blocks', this)">
+        <span class="icon">🏢</span> Blocks
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-info">
+          <div class="u-name" id="sidebar-username">—</div>
+          <div class="u-role">
+            <span class="role-badge" id="sidebar-role">—</span>
+          </div>
+        </div>
+        <div class="nav-item admin-only" onclick="showPage('users', this)">
+          <span class="icon">👤</span> User Accounts
+        </div>
+        <div class="nav-item" onclick="refreshAll()">
+          <span class="icon">🔄</span> Refresh Data
+        </div>
+        <div class="nav-item" onclick="doLogout()" style="color: var(--danger)">
+          <span class="icon">🚪</span> Logout
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <!-- ============ DASHBOARD ============ -->
+      <div class="page active" id="page-dashboard">
+        <div class="topbar">
+          <div>
+            <div class="page-title">Good Morning, <span>Admin!</span></div>
+            <div style="font-size: 13px; color: var(--muted); margin-top: 2px">
+              Here's what's happening today.
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-student-modal')"
+            >
+              + Add Student
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent1)"
+              id="dash-total-students"
+            >
+              —
+            </div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🛏️</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent2)"
+              id="dash-occupied-rooms"
+            >
+              —
+            </div>
+            <div class="stat-label">Rooms Occupied</div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                id="room-progress"
+                style="width: 0%; background: var(--accent2)"
+              ></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent3)"
+              id="dash-fees-collected"
+            >
+              —
+            </div>
+            <div class="stat-label">Paid Students</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent4)"
+              id="dash-open-complaints"
+            >
+              —
+            </div>
+            <div class="stat-label">Open Complaints</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent Students</div>
+              <button
+                class="btn btn-outline btn-sm"
+                onclick="
+                  showPage(
+                    'students',
+                    document.querySelector('[onclick*=students]'),
+                  )
+                "
+              >
+                View All
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <tr>
+                  <th>Student</th>
+                  <th>Room</th>
+                  <th>Fee Status</th>
+                </tr>
+              </table>
+              <div id="dash-recent-students"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Monthly Fee Collection</div>
+              <span style="font-size: 12px; color: var(--muted)">Overview</span>
+            </div>
+            <div class="chart-bars" id="feeChart"></div>
+            <div class="chart-labels" id="feeLabels"></div>
+            <div
+              style="
+                margin-top: 16px;
+                display: flex;
+                gap: 16px;
+                font-size: 12px;
+              "
+            >
+              <span style="color: var(--accent3)">● Paid</span>
+              <span style="color: var(--danger)">● Pending/Unpaid</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Active Visitors</div>
+              <span class="badge badge-active" id="active-visitors-count"
+                >0 In</span
+              >
+            </div>
+            <div id="dashboard-visitors">
+              <div class="loading">
+                <div class="spinner"></div>
+                Loading...
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Alerts & Notices</div>
+            </div>
+            <div id="dash-alerts">
+              <div class="loading">
+                <div class="spinner"></div>
+                Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ STUDENTS ============ -->
+      <div class="page" id="page-students">
+        <div class="topbar">
+          <div class="page-title">Student <span>Management</span></div>
+          <div class="topbar-right">
+            <div class="search-box">
+              <span>🔍</span>
+              <input
+                type="text"
+                placeholder="Search students..."
+                oninput="filterStudents(this.value)"
+              />
+            </div>
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-student-modal')"
+            >
+              + Add Student
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              All Students (<span id="student-count">0</span>)
+            </div>
+            <div style="display: flex; gap: 8px">
+              <select
+                style="width: auto; padding: 6px 12px; font-size: 12px"
+                onchange="filterByFeeStatus(this.value)"
+              >
+                <option value="">All Fee Status</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="students-table">
+              <tr>
+                <th>USN / Name</th>
+                <th>Room</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>Fee Status</th>
+                <th>Contact</th>
+                <th>Actions</th>
+              </tr>
+            </table>
+          </div>
+          <div id="students-loading" class="loading">
+            <div class="spinner"></div>
+            Loading students...
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ROOMS ============ -->
+      <div class="page" id="page-rooms">
+        <div class="topbar">
+          <div class="page-title">Rooms <span>Blocks</span></div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-outline"
+              onclick="openModal('add-room-modal')"
+            >
+              + Add Room
+            </button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🏢</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent1)"
+              id="total-rooms-count"
+            >
+              —
+            </div>
+            <div class="stat-label">Total Rooms</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div
+              class="stat-value"
+              style="color: var(--success)"
+              id="available-rooms-count"
+            >
+              —
+            </div>
+            <div class="stat-label">Available Rooms</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔴</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent1)"
+              id="occupied-rooms-count"
+            >
+              —
+            </div>
+            <div class="stat-label">Occupied Rooms</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔧</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent4)"
+              id="maintenance-rooms-count"
+            >
+              —
+            </div>
+            <div class="stat-label">Under Maintenance</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title" style="margin-bottom: 12px">
+                Room Layout by Block
+              </div>
+              <div class="block-tabs" id="block-tabs">
+                <!-- dynamic tabs -->
+              </div>
+            </div>
+            <div class="legend">
+              <div class="legend-item">
+                <div
+                  class="legend-dot"
+                  style="background: var(--success)"
+                ></div>
+                Available
+              </div>
+              <div class="legend-item">
+                <div
+                  class="legend-dot"
+                  style="background: var(--accent1)"
+                ></div>
+                Occupied
+              </div>
+              <div class="legend-item">
+                <div
+                  class="legend-dot"
+                  style="background: var(--accent4)"
+                ></div>
+                Maintenance
+              </div>
+            </div>
+          </div>
+          <div class="room-grid" id="room-grid">
+            <div class="loading">
+              <div class="spinner"></div>
+              Loading rooms...
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">All Rooms — Table View</div>
+          </div>
+          <div class="table-wrap">
+            <table id="rooms-table">
+              <tr>
+                <th>Room No</th>
+                <th>Block</th>
+                <th>Floor</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </table>
+          </div>
+          <div id="rooms-loading" class="loading">
+            <div class="spinner"></div>
+            Loading...
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PAYMENTS ============ -->
+      <div class="page" id="page-payments">
+        <div class="topbar">
+          <div class="page-title">Fee <span>Payments</span></div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-payment-modal')"
+            >
+              + Record Payment
+            </button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div
+              class="stat-value"
+              style="color: var(--success)"
+              id="total-collected"
+            >
+              —
+            </div>
+            <div class="stat-label">Total Collected</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div
+              class="stat-value"
+              style="color: var(--danger)"
+              id="total-pending-amount"
+            >
+              —
+            </div>
+            <div class="stat-label">Pending Amount</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent2)"
+              id="paid-count"
+            >
+              —
+            </div>
+            <div class="stat-label">Paid Records</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">❌</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent1)"
+              id="defaulters-count"
+            >
+              —
+            </div>
+            <div class="stat-label">Unpaid Records</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              Payment Records (<span id="payments-count">0</span>)
+            </div>
+            <div style="display: flex; gap: 8px">
+              <select
+                style="width: auto; padding: 6px 12px; font-size: 12px"
+                onchange="filterPayments(this.value)"
+              >
+                <option value="">All Status</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="payments-table">
+              <tr>
+                <th>USN</th>
+                <th>Amount</th>
+                <th>Month</th>
+                <th>Due Date</th>
+                <th>Paid On</th>
+                <th>Mode</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </table>
+          </div>
+          <div id="payments-loading" class="loading">
+            <div class="spinner"></div>
+            Loading...
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ COMPLAINTS ============ -->
+      <div class="page" id="page-complaints">
+        <div class="topbar">
+          <div class="page-title">Complaints & <span>Issues</span></div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-complaint-modal')"
+            >
+              + New Complaint
+            </button>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                Open / In Progress (<span id="open-count">0</span>)
+              </div>
+            </div>
+            <div id="open-complaints">
+              <div class="loading">
+                <div class="spinner"></div>
+                Loading...
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                Resolved (<span id="resolved-count">0</span>)
+              </div>
+            </div>
+            <div id="resolved-complaints">
+              <div class="loading">
+                <div class="spinner"></div>
+                Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ VISITORS ============ -->
+      <div class="page" id="page-visitors">
+        <div class="topbar">
+          <div class="page-title">Visitor <span>Management</span></div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-visitor-modal')"
+            >
+              + Log Visitor
+            </button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🚶</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent1)"
+              id="visitors-in"
+            >
+              —
+            </div>
+            <div class="stat-label">Currently In</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent2)"
+              id="visitors-today"
+            >
+              —
+            </div>
+            <div class="stat-label">Today's Visitors</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent3)"
+              id="visitors-total"
+            >
+              —
+            </div>
+            <div class="stat-label">Total Records</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div
+              class="stat-value"
+              style="color: var(--accent4)"
+              id="visitors-out"
+            >
+              —
+            </div>
+            <div class="stat-label">Exited</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Visitor Log</div>
+            <div class="search-box">
+              <span>🔍</span>
+              <input
+                type="text"
+                placeholder="Search visitor..."
+                style="width: 130px"
+                oninput="filterVisitors(this.value)"
+              />
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="visitor-table">
+              <tr>
+                <th>Visitor</th>
+                <th>Student USN</th>
+                <th>Room</th>
+                <th>Purpose</th>
+                <th>In Time</th>
+                <th>Out Time</th>
+                <th>Time Left</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </table>
+          </div>
+          <div id="visitors-loading" class="loading">
+            <div class="spinner"></div>
+            Loading...
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ STAFF ============ -->
+      <div class="page" id="page-staff">
+        <div class="topbar">
+          <div class="page-title">Staff <span>Management</span></div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-staff-modal')"
+            >
+              + Add Staff
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              All Staff (<span id="staff-count">0</span>)
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="staff-table">
+              <tr>
+                <th>Staff ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Block</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Actions</th>
+              </tr>
+            </table>
+          </div>
+          <div id="staff-loading" class="loading">
+            <div class="spinner"></div>
+            Loading...
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ BLOCKS ============ -->
+      <div class="page" id="page-blocks">
+        <div class="topbar">
+          <div class="page-title">Hostel <span>Blocks</span></div>
+          <div class="topbar-right">
+            <button
+              class="btn btn-primary"
+              onclick="openModal('add-block-modal')"
+            >
+              + Add Block
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              All Blocks (<span id="blocks-count">0</span>)
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="blocks-table">
+              <tr>
+                <th>Block ID</th>
+                <th>Block Name</th>
+                <th>Total Floors</th>
+                <th>Total Rooms</th>
+                <th>Actions</th>
+              </tr>
+            </table>
+          </div>
+          <div id="blocks-loading" class="loading">
+            <div class="spinner"></div>
+            Loading...
+          </div>
+        </div>
+      </div>
+      <!-- USERS PAGE (Admin only) -->
+    <div class="page" id="page-users">
+      <div class="topbar">
+        <div class="page-title">User <span>Accounts</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" onclick="openModal('add-user-modal')">
+            + Add User
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--muted)">
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </main>
+
+    <!-- ========= MODALS ========= -->
+
+    <!-- Add Student -->
+    <div class="modal-overlay" id="add-student-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Add New Student
+          <span class="modal-close" onclick="closeModal('add-student-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>USN *</label
+            ><input id="s-usn" placeholder="e.g. 1NI24CS010" />
+          </div>
+          <div class="form-group">
+            <label>Full Name *</label
+            ><input id="s-name" placeholder="Full name" />
+          </div>
+          <div class="form-group">
+            <label>Email *</label
+            ><input type="email" id="s-email" placeholder="student@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Mobile *</label
+            ><input id="s-mobile" placeholder="10-digit mobile" />
+          </div>
+          <div class="form-group">
+            <label>Course *</label
+            ><input id="s-course" placeholder="e.g. CSE, ECE, ME" />
+          </div>
+          <div class="form-group">
+            <label>Year *</label>
+            <select id="s-year">
+              <option value="1st">1st Year</option>
+              <option value="2nd">2nd Year</option>
+              <option value="3rd">3rd Year</option>
+              <option value="4th">4th Year</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Room No. *</label
+            ><input id="s-room" placeholder="e.g. A-101" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-student-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addStudent()">
+            Add Student
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Student -->
+    <div class="modal-overlay" id="edit-student-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Edit Student
+          <span class="modal-close" onclick="closeModal('edit-student-modal')"
+            >✕</span
+          >
+        </div>
+        <input type="hidden" id="edit-s-usn" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name</label><input id="edit-s-name" />
+          </div>
+          <div class="form-group">
+            <label>Email</label><input type="email" id="edit-s-email" />
+          </div>
+          <div class="form-group">
+            <label>Mobile</label><input id="edit-s-mobile" />
+          </div>
+          <div class="form-group">
+            <label>Course</label><input id="edit-s-course" />
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <select id="edit-s-year">
+              <option value="1st">1st</option>
+              <option value="2nd">2nd</option>
+              <option value="3rd">3rd</option>
+              <option value="4th">4th</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Room No.</label><input id="edit-s-room" />
+          </div>
+          <div class="form-group full">
+            <label>Fee Status</label>
+            <select id="edit-s-fee">
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('edit-student-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="updateStudent()">
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Room -->
+    <div class="modal-overlay" id="add-room-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Add New Room
+          <span class="modal-close" onclick="closeModal('add-room-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Room Number *</label
+            ><input id="r-num" placeholder="e.g. A-301" />
+          </div>
+          <div class="form-group">
+            <label>Block ID *</label><input id="r-block" placeholder="e.g. A" />
+          </div>
+          <div class="form-group">
+            <label>Floor *</label
+            ><input type="number" id="r-floor" placeholder="1" />
+          </div>
+          <div class="form-group">
+            <label>Type *</label>
+            <select id="r-type">
+              <option value="Single">Single</option>
+              <option value="Double">Double</option>
+              <option value="Triple">Triple</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Capacity *</label
+            ><input type="number" id="r-capacity" placeholder="1" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="r-status">
+              <option value="available">Available</option>
+              <option value="occupied">Occupied</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-room-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addRoom()">Add Room</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Payment -->
+    <div class="modal-overlay" id="add-payment-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Record Payment
+          <span class="modal-close" onclick="closeModal('add-payment-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Student USN *</label
+            ><input id="p-usn" placeholder="Student USN" />
+          </div>
+          <div class="form-group">
+            <label>Amount (₹) *</label
+            ><input type="number" id="p-amount" placeholder="e.g. 8000" />
+          </div>
+          <div class="form-group">
+            <label>Month *</label
+            ><input id="p-month" placeholder="e.g. August 2024" />
+          </div>
+          <div class="form-group">
+            <label>Due Date *</label><input type="date" id="p-due-date" />
+          </div>
+          <div class="form-group">
+            <label>Paid Date</label><input type="date" id="p-paid-date" />
+          </div>
+          <div class="form-group">
+            <label>Payment Mode *</label>
+            <select id="p-mode">
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Card">Card</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Transaction ID</label
+            ><input id="p-txn" placeholder="TXN ID (if any)" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="p-status">
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-payment-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addPayment()">
+            Save Payment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Complaint -->
+    <div class="modal-overlay" id="add-complaint-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Register Complaint
+          <span class="modal-close" onclick="closeModal('add-complaint-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Student USN *</label
+            ><input id="c-usn" placeholder="Student USN" />
+          </div>
+          <div class="form-group">
+            <label>Room No. *</label
+            ><input id="c-room" placeholder="e.g. A-101" />
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="c-category">
+              <option value="Electrical">Electrical</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Cleaning">Cleaning</option>
+              <option value="Internet">Internet</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="c-priority">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Title *</label
+            ><input id="c-title" placeholder="Brief complaint title" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label
+            ><textarea
+              id="c-desc"
+              placeholder="Describe the issue..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-complaint-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addComplaint()">
+            Submit Complaint
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Visitor -->
+    <div class="modal-overlay" id="add-visitor-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Log Visitor Entry
+          <span class="modal-close" onclick="closeModal('add-visitor-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Visitor Name *</label
+            ><input id="v-name" placeholder="Full name" />
+          </div>
+          <div class="form-group">
+            <label>Visitor Mobile *</label
+            ><input id="v-mobile" placeholder="Mobile number" />
+          </div>
+          <div class="form-group">
+            <label>Student USN *</label
+            ><input id="v-usn" placeholder="Student USN" />
+          </div>
+          <div class="form-group">
+            <label>Room No. *</label
+            ><input id="v-room" placeholder="e.g. A-101" />
+          </div>
+          <div class="form-group">
+            <label>Purpose *</label>
+            <select id="v-purpose">
+              <option value="Personal">Personal</option>
+              <option value="Academic">Academic</option>
+              <option value="Family">Family</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>In Time *</label><input type="time" id="v-intime" />
+            <input type="hidden" id="v-inseconds" value="00" />
+          </div>
+          <div class="form-group">
+            <label>Time Limit (minutes) *</label>
+            <input type="number" id="v-duration" placeholder="e.g. 60" min="15" max="480" value="60" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-visitor-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addVisitor()">
+            Log Entry
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Staff -->
+    <div class="modal-overlay" id="add-staff-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Add Staff Member
+          <span class="modal-close" onclick="closeModal('add-staff-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Staff ID *</label
+            ><input id="st-id" placeholder="e.g. S005" />
+          </div>
+          <div class="form-group">
+            <label>Full Name *</label
+            ><input id="st-name" placeholder="Full name" />
+          </div>
+          <div class="form-group">
+            <label>Email *</label
+            ><input type="email" id="st-email" placeholder="staff@hostel.com" />
+          </div>
+          <div class="form-group">
+            <label>Mobile *</label
+            ><input id="st-mobile" placeholder="Mobile number" />
+          </div>
+          <div class="form-group">
+            <label>Role *</label>
+            <select id="st-role">
+              <option value="Warden">Warden</option>
+              <option value="Assistant Warden">Assistant Warden</option>
+              <option value="Helper">Helper</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Block ID</label><input id="st-block" placeholder="e.g. A" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-staff-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addStaff()">
+            Add Staff
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Block -->
+    <div class="modal-overlay" id="add-block-modal">
+      <div class="modal">
+        <div class="modal-title">
+          Add Hostel Block
+          <span class="modal-close" onclick="closeModal('add-block-modal')"
+            >✕</span
+          >
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Block ID *</label
+            ><input id="bl-id" placeholder="e.g. E (single char)" />
+          </div>
+          <div class="form-group">
+            <label>Block Name *</label
+            ><input id="bl-name" placeholder="e.g. Block E" />
+          </div>
+          <div class="form-group">
+            <label>Total Floors *</label
+            ><input type="number" id="bl-floors" placeholder="4" />
+          </div>
+          <div class="form-group">
+            <label>Total Rooms *</label
+            ><input type="number" id="bl-rooms" placeholder="20" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('add-block-modal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addBlock()">
+            Add Block
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Room Detail Modal -->
+    <div class="modal-overlay" id="room-detail-modal">
+      <div class="modal">
+        <div class="modal-title" id="room-modal-title">
+          Room Detail
+          <span class="modal-close" onclick="closeModal('room-detail-modal')"
+            >✕</span
+          >
+        </div>
+        <div id="room-modal-body"></div>
+        <div class="form-actions">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('room-detail-modal')"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD USER MODAL -->
+    <div class="modal-overlay" id="add-user-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Create User Account</div>
+          <button class="modal-close" onclick="closeModal('add-user-modal')">
+            ✕
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label>Full Name</label>
+            <input type="text" id="u-name" placeholder="e.g. John Doe" />
+          </div>
+          <div class="field-group">
+            <label>Email</label>
+            <input
+              type="email"
+              id="u-email"
+              placeholder="e.g. john@hostel.com"
+            />
+          </div>
+          <div class="field-group">
+            <label>Password</label>
+            <input
+              type="password"
+              id="u-password"
+              placeholder="Min 6 characters"
+            />
+          </div>
+          <div class="field-group">
+            <label>Role</label>
+            <select id="u-role">
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal('add-user-modal')">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="addUser()">
+            Create Account
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <span class="toast-icon" id="toast-icon">✅</span>
+      <span id="toast-msg">Action successful!</span>
+    </div>
+
+    <script>
+      const API = "http://localhost:5000/api";
+
+      // ========= STATE =========
+      let allStudents = [];
+      let allRooms = [];
+      let allPayments = [];
+      let allComplaints = [];
+      let allVisitors = [];
+      let allStaff = [];
+      let allBlocks = [];
+      let activeBlock = null;
+
+      // ========= API HELPERS =========
+      async function apiFetch(path, opts = {}) {
+        try {
+          const token = localStorage.getItem("hms_token");
+          const res = await fetch(API + path, {
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: "Bearer " + token } : {}),
+            },
+            ...opts,
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `HTTP ${res.status}`);
+          }
+          return await res.json();
+        } catch (e) {
+          throw e;
+        }
+      }
+
+      // ========= NAVIGATION =========
+      function showPage(id, el) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        document.getElementById("page-" + id).classList.add("active");
+        if (el) el.classList.add("active");
+
+        // Lazy load data when page is shown
+        if (id === "students") loadStudents();
+        if (id === "rooms") loadRooms();
+        if (id === "payments") loadPayments();
+        if (id === "complaints") loadComplaints();
+        if (id === "visitors") loadVisitors();
+        if (id === "staff") loadStaff();
+        if (id === "blocks") loadBlocks();
+        if (id === "users") loadUsers();
+      }
+
+      // ========= MODAL =========
+      function openModal(id) {
+        document.getElementById(id).classList.add("open");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+      document.querySelectorAll(".modal-overlay").forEach((m) => {
+        m.addEventListener("click", (e) => {
+          if (e.target === m) m.classList.remove("open");
+        });
+      });
+
+      // ========= TOAST =========
+      function showToast(msg, isError = false) {
+        const t = document.getElementById("toast");
+        const icon = document.getElementById("toast-icon");
+        document.getElementById("toast-msg").textContent = msg;
+        icon.textContent = isError ? "❌" : "✅";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3500);
+      }
+
+      // ========= AVATAR =========
+      const colors = [
+        "linear-gradient(135deg,#ff6b35,#ff9068)",
+        "linear-gradient(135deg,#7c4dff,#9e6fff)",
+        "linear-gradient(135deg,#00e5bd,#00b894)",
+        "linear-gradient(135deg,#ffb800,#ffcc44)",
+        "linear-gradient(135deg,#ff4757,#ff6b81)",
+        "linear-gradient(135deg,#1e90ff,#74b9ff)",
+      ];
+      function getColor(i) {
+        return colors[i % colors.length];
+      }
+      function initials(name) {
+        return (name || "?")
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+      }
+      function fmt(val) {
+        return val ?? "—";
+      }
+      function fmtDate(d) {
+        return d ? d.split("T")[0] : "—";
+      }
+
+      // ========= STUDENTS =========
+      async function loadStudents() {
+        document.getElementById("students-loading").style.display = "flex";
+        // clear old rows
+        const table = document.getElementById("students-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        try {
+          allStudents = await apiFetch("/students");
+          renderStudents(allStudents);
+          document.getElementById("student-count").textContent =
+            allStudents.length;
+          document.getElementById("students-badge").textContent =
+            allStudents.length;
+        } catch (e) {
+          showToast("Failed to load students: " + e.message, true);
+        }
+        document.getElementById("students-loading").style.display = "none";
+      }
+
+      function renderStudents(data) {
+        allStudents = data;
+        const table = document.getElementById("students-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        document.getElementById("student-count").textContent = data.length;
+        data.forEach((s, i) => {
+          const badge =
+            s.fee_status === "paid"
+              ? "badge-paid"
+              : s.fee_status === "unpaid"
+                ? "badge-unpaid"
+                : "badge-pending";
+          const row = table.insertRow();
+          row.innerHTML = `
+      <td><div style="display:flex;align-items:center">
+        <div class="avatar" style="background:${getColor(i)}">${initials(s.name)}</div>
+        <div><div style="font-weight:500">${s.name}</div><div style="font-size:11px;color:var(--muted)">${s.usn}</div></div>
+      </div></td>
+      <td>${fmt(s.room_no)}</td>
+      <td>${fmt(s.course)}</td>
+      <td>${fmt(s.year)}</td>
+      <td><span class="badge ${badge}">${s.fee_status || "pending"}</span></td>
+      <td style="color:var(--muted);font-size:13px">${fmt(s.mobile)}</td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-outline btn-sm" onclick="openEditStudent(${i})">Edit</button>
+        ${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.usn}')">Remove</button>` : ""}
+      </div></td>
+    `;
+        });
+      }
+
+      function filterStudents(q) {
+        const filtered = allStudents.filter(
+          (s) =>
+            s.name.toLowerCase().includes(q.toLowerCase()) ||
+            s.usn.toLowerCase().includes(q.toLowerCase()),
+        );
+        renderStudents(filtered);
+      }
+
+      function filterByFeeStatus(v) {
+        const filtered = v
+          ? allStudents.filter((s) => s.fee_status === v)
+          : allStudents;
+        renderStudents(filtered);
+      }
+
+      async function addStudent() {
+        const usn = document.getElementById("s-usn").value.trim();
+        const name = document.getElementById("s-name").value.trim();
+        const email = document.getElementById("s-email").value.trim();
+        const mobile = document.getElementById("s-mobile").value.trim();
+        const course = document.getElementById("s-course").value.trim();
+        const year = document.getElementById("s-year").value;
+        const room_no = document.getElementById("s-room").value.trim();
+        if (!usn || !name || !email || !mobile || !course || !room_no) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        if (!/^\S{5,15}$/.test(usn)) {
+          showToast("USN must be 5–15 characters with no spaces", true);
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showToast("Invalid email format", true);
+          return;
+        }
+        if (!/^\d{10}$/.test(mobile)) {
+          showToast("Mobile must be exactly 10 digits", true);
+          return;
+        }
+        try {
+          await apiFetch("/students", {
+            method: "POST",
+            body: JSON.stringify({
+              usn,
+              name,
+              email,
+              mobile,
+              course,
+              year,
+              room_no,
+            }),
+          });
+          showToast("✅ Student admitted successfully!");
+          closeModal("add-student-modal");
+          [
+            "s-usn",
+            "s-name",
+            "s-email",
+            "s-mobile",
+            "s-course",
+            "s-room",
+          ].forEach((id) => (document.getElementById(id).value = ""));
+          allStudents = [];
+          await loadStudents();
+          await loadDashboard();
+       } catch (e) {
+  showToast(e.message || "Failed to add student", true);
+}
+      }
+
+      function openEditStudent(index) {
+        const s = allStudents[index];
+        document.getElementById("edit-s-usn").value = s.usn;
+        document.getElementById("edit-s-name").value = s.name;
+        document.getElementById("edit-s-email").value = s.email;
+        document.getElementById("edit-s-mobile").value = s.mobile;
+        document.getElementById("edit-s-course").value = s.course;
+        document.getElementById("edit-s-year").value = s.year;
+        document.getElementById("edit-s-room").value = s.room_no || "";
+        document.getElementById("edit-s-fee").value = s.fee_status || "pending";
+        openModal("edit-student-modal");
+      }
+
+      async function updateStudent() {
+        const usn = document.getElementById("edit-s-usn").value;
+        const body = {
+          name: document.getElementById("edit-s-name").value,
+          email: document.getElementById("edit-s-email").value,
+          mobile: document.getElementById("edit-s-mobile").value,
+          course: document.getElementById("edit-s-course").value,
+          year: document.getElementById("edit-s-year").value,
+          room_no: document.getElementById("edit-s-room").value,
+          fee_status: document.getElementById("edit-s-fee").value,
+        };
+        try {
+          await apiFetch("/students/" + usn, {
+            method: "PUT",
+            body: JSON.stringify(body),
+          });
+          showToast("✅ Student updated!");
+          closeModal("edit-student-modal");
+          allStudents = [];
+          await loadStudents();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deleteStudent(usn) {
+        if (!confirm(`Remove student ${usn}? This cannot be undone.`)) return;
+        try {
+          await apiFetch("/students/" + usn, { method: "DELETE" });
+          showToast("🗑️ Student removed");
+          allStudents = [];
+          await loadStudents();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= ROOMS =========
+      async function loadRooms() {
+        document.getElementById("rooms-loading").style.display = "flex";
+        const table = document.getElementById("rooms-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        try {
+          allRooms = await apiFetch("/rooms");
+          renderRoomsTable(allRooms);
+          renderRoomStats(allRooms);
+          renderBlockTabs(allRooms);
+        } catch (e) {
+          showToast("Failed to load rooms: " + e.message, true);
+        }
+        document.getElementById("rooms-loading").style.display = "none";
+      }
+
+      function renderRoomStats(data) {
+        document.getElementById("total-rooms-count").textContent = data.length;
+        document.getElementById("available-rooms-count").textContent =
+          data.filter((r) => r.status === "available").length;
+        document.getElementById("occupied-rooms-count").textContent =
+          data.filter((r) => r.status === "occupied").length;
+        document.getElementById("maintenance-rooms-count").textContent =
+          data.filter((r) => r.status === "maintenance").length;
+      }
+
+      function renderBlockTabs(rooms) {
+        const blocks = [...new Set(rooms.map((r) => r.block_id))].sort();
+        const tabsEl = document.getElementById("block-tabs");
+        tabsEl.innerHTML = "";
+        blocks.forEach((b, i) => {
+          const btn = document.createElement("button");
+          btn.className = "block-tab" + (i === 0 ? " active" : "");
+          btn.textContent = "Block " + b;
+          btn.onclick = () => showBlock(b, btn);
+          tabsEl.appendChild(btn);
+        });
+        if (blocks.length > 0) showBlock(blocks[0], tabsEl.children[0]);
+      }
+
+      function showBlock(block, el) {
+        activeBlock = block;
+        document
+          .querySelectorAll(".block-tab")
+          .forEach((t) => t.classList.remove("active"));
+        el.classList.add("active");
+        const grid = document.getElementById("room-grid");
+        grid.innerHTML = "";
+        const blockRooms = allRooms.filter((r) => r.block_id === block);
+        if (blockRooms.length === 0) {
+          grid.innerHTML =
+            '<div style="color:var(--muted);font-size:13px">No rooms in this block.</div>';
+          return;
+        }
+        blockRooms.forEach((r) => {
+          const div = document.createElement("div");
+          div.className = `room-card ${r.status}`;
+          div.innerHTML = `<div class="room-num">${r.room_no}</div><div class="room-type">${r.type}</div><div class="room-status">${r.status}</div>`;
+          div.onclick = () => showRoomDetail(r);
+          grid.appendChild(div);
+        });
+      }
+
+      function showRoomDetail(r) {
+        document.getElementById("room-modal-title").innerHTML =
+          `Room ${r.room_no} <span class="modal-close" onclick="closeModal('room-detail-modal')">✕</span>`;
+        const statusColor =
+          r.status === "available"
+            ? "var(--success)"
+            : r.status === "occupied"
+              ? "var(--accent1)"
+              : "var(--accent4)";
+        const student = allStudents.find((s) => s.room_no === r.room_no);
+        document.getElementById("room-modal-body").innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:var(--surface2);border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">TYPE</div>
+        <div style="font-weight:600">${r.type}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">STATUS</div>
+        <div style="font-weight:600;color:${statusColor}">${r.status.toUpperCase()}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">BLOCK</div>
+        <div style="font-weight:600">Block ${r.block_id}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">FLOOR</div>
+        <div style="font-weight:600">Floor ${r.floor}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px;grid-column:1/-1">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">CAPACITY</div>
+        <div style="font-weight:600">${r.capacity} person(s)</div>
+      </div>
+    </div>
+    ${student ? `<div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:14px;font-size:13px"><b>Occupied by:</b> ${student.name} (${student.usn})</div>` : ""}
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-danger btn-sm" onclick="deleteRoom('${r.room_no}');closeModal('room-detail-modal')">Delete Room</button>
+    </div>
+  `;
+        openModal("room-detail-modal");
+      }
+
+      function renderRoomsTable(data) {
+        const table = document.getElementById("rooms-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        data.forEach((r) => {
+          const badge =
+            r.status === "available"
+              ? "badge-available"
+              : r.status === "occupied"
+                ? "badge-occupied"
+                : "badge-maintenance";
+          const row = table.insertRow();
+          row.innerHTML = `
+      <td style="font-weight:600;font-family:'Syne',sans-serif">${r.room_no}</td>
+      <td>Block ${r.block_id}</td>
+      <td>${r.floor}</td>
+      <td>${r.type}</td>
+      <td>${r.capacity}</td>
+      <td><span class="badge ${badge}">${r.status}</span></td>
+      <td>
+        ${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteRoom('${r.room_no}')">Delete</button>` : ""}
+      </td>
+    `;
+        });
+      }
+
+      async function addRoom() {
+        const room_no = document.getElementById("r-num").value.trim();
+        const block_id = document.getElementById("r-block").value.trim();
+        const floor = parseInt(document.getElementById("r-floor").value);
+        const type = document.getElementById("r-type").value;
+        const capacity = parseInt(document.getElementById("r-capacity").value);
+        const status = document.getElementById("r-status").value;
+        if (!room_no || !block_id || isNaN(floor) || isNaN(capacity)) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        try {
+          await apiFetch("/rooms", {
+            method: "POST",
+            body: JSON.stringify({
+              room_no,
+              block_id,
+              floor,
+              type,
+              capacity,
+              status,
+            }),
+          });
+          showToast("✅ Room added!");
+          closeModal("add-room-modal");
+          allRooms = [];
+          await loadRooms();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deleteRoom(id) {
+        if (!confirm(`Delete room ${id}?`)) return;
+        try {
+          await apiFetch("/rooms/" + id, { method: "DELETE" });
+          showToast("🗑️ Room deleted");
+          allRooms = [];
+          await loadRooms();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= PAYMENTS =========
+      async function loadPayments() {
+        document.getElementById("payments-loading").style.display = "flex";
+        const table = document.getElementById("payments-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        try {
+          const _usn = localStorage.getItem("hms_usn");
+          allPayments = await apiFetch(
+            _usn ? "/payments?usn=" + _usn : "/payments",
+          );
+          renderPayments(allPayments);
+          renderPaymentStats(allPayments);
+          document.getElementById("payments-badge").textContent =
+            allPayments.filter((p) => p.status !== "paid").length;
+        } catch (e) {
+          showToast("Failed to load payments: " + e.message, true);
+        }
+        document.getElementById("payments-loading").style.display = "none";
+      }
+
+      function renderPaymentStats(data) {
+        const paid = data.filter((p) => p.status === "paid");
+        const unpaid = data.filter((p) => p.status !== "paid");
+        const totalCollected = paid.reduce(
+          (sum, p) => sum + parseFloat(p.amount || 0),
+          0,
+        );
+        const totalPending = unpaid.reduce(
+          (sum, p) => sum + parseFloat(p.amount || 0),
+          0,
+        );
+        document.getElementById("total-collected").textContent =
+          "₹" + totalCollected.toLocaleString("en-IN");
+        document.getElementById("total-pending-amount").textContent =
+          "₹" + totalPending.toLocaleString("en-IN");
+        document.getElementById("paid-count").textContent = paid.length;
+        document.getElementById("defaulters-count").textContent = data.filter(
+          (p) => p.status === "unpaid",
+        ).length;
+        document.getElementById("payments-count").textContent = data.length;
+      }
+
+      function renderPayments(data) {
+        const table = document.getElementById("payments-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        document.getElementById("payments-count").textContent = data.length;
+        data.forEach((p) => {
+          const badge =
+            p.status === "paid"
+              ? "badge-paid"
+              : p.status === "unpaid"
+                ? "badge-unpaid"
+                : "badge-pending";
+          const row = table.insertRow();
+          row.innerHTML = `
+      <td style="font-family:'Syne',sans-serif;font-size:12px;color:var(--muted)">${p.usn}</td>
+      <td style="font-weight:600">₹${parseFloat(p.amount).toLocaleString("en-IN")}</td>
+      <td>${fmt(p.month)}</td>
+      <td style="color:var(--danger)">${fmtDate(p.due_date)}</td>
+      <td style="color:var(--muted)">${fmtDate(p.paid_date)}</td>
+      <td>${fmt(p.mode)}</td>
+      <td><span class="badge ${badge}">${p.status}</span></td>
+      <td>${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deletePayment(${p.payment_id})">Delete</button>` : ""}</td>
+    `;
+        });
+      }
+
+      function filterPayments(v) {
+        const filtered = v
+          ? allPayments.filter((p) => p.status === v)
+          : allPayments;
+        renderPayments(filtered);
+      }
+
+      async function addPayment() {
+        const usn = document.getElementById("p-usn").value.trim();
+        const amount = parseFloat(document.getElementById("p-amount").value);
+        const month = document.getElementById("p-month").value.trim();
+        const due_date = document.getElementById("p-due-date").value;
+        const paid_date = document.getElementById("p-paid-date").value || null;
+        const mode = document.getElementById("p-mode").value;
+        const txn_id = document.getElementById("p-txn").value.trim() || null;
+        const status = document.getElementById("p-status").value;
+        if (!usn || isNaN(amount) || !month || !due_date) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        if (isNaN(amount) || Number(amount) <= 0) {
+          showToast("Amount must be a positive number", true);
+          return;
+        }
+        if (!usn || !amount || !month || !due_date || !mode) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        try {
+          await apiFetch("/payments", {
+            method: "POST",
+            body: JSON.stringify({
+              usn,
+              amount,
+              month,
+              due_date,
+              paid_date,
+              mode,
+              txn_id,
+              status,
+            }),
+          });
+          showToast("✅ Payment recorded!");
+          closeModal("add-payment-modal");
+          allPayments = [];
+          await loadPayments();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deletePayment(id) {
+        if (!confirm("Delete this payment record?")) return;
+        try {
+          await apiFetch("/payments/" + id, { method: "DELETE" });
+          showToast("🗑️ Payment deleted");
+          allPayments = [];
+          await loadPayments();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= COMPLAINTS =========
+      async function loadComplaints() {
+        document.getElementById("open-complaints").innerHTML =
+          '<div class="loading"><div class="spinner"></div>Loading...</div>';
+        document.getElementById("resolved-complaints").innerHTML = "";
+        try {
+          const _usn = localStorage.getItem("hms_usn");
+          allComplaints = await apiFetch(
+            _usn ? "/complaints?usn=" + _usn : "/complaints",
+          );
+          renderComplaints(allComplaints);
+          const openCount = allComplaints.filter(
+            (c) => c.status !== "resolved",
+          ).length;
+          document.getElementById("complaints-badge").textContent = openCount;
+        } catch (e) {
+          showToast("Failed to load complaints: " + e.message, true);
+          document.getElementById("open-complaints").innerHTML =
+            '<div class="error-state"><div class="error-icon">⚠️</div>Could not load complaints</div>';
+        }
+      }
+
+      function renderComplaints(data) {
+        const open = document.getElementById("open-complaints");
+        const resolved = document.getElementById("resolved-complaints");
+        open.innerHTML = "";
+        resolved.innerHTML = "";
+        const openItems = data.filter((c) => c.status !== "resolved");
+        const resolvedItems = data.filter((c) => c.status === "resolved");
+        document.getElementById("open-count").textContent = openItems.length;
+        document.getElementById("resolved-count").textContent =
+          resolvedItems.length;
+
+        openItems.forEach((c) => {
+          const div = document.createElement("div");
+          div.className = `complaint-item ${c.status.replace("-", "_")}`;
+          const pBadge =
+            c.priority === "High"
+              ? "badge-unpaid"
+              : c.priority === "Medium"
+                ? "badge-pending"
+                : "badge-inactive";
+          div.innerHTML = `
+      <div class="complaint-header">
+        <div class="complaint-title">${c.title}</div>
+        <span class="badge badge-open">${c.status}</span>
+      </div>
+      <div class="complaint-meta">👤 ${c.usn} · 🛏 ${c.room_no} · 🏷️ ${c.category} · 🔴 <span class="badge ${pBadge}" style="padding:1px 6px;font-size:10px">${c.priority}</span></div>
+      ${c.description ? `<div style="font-size:12px;color:var(--muted);margin-top:6px">${c.description}</div>` : ""}
+      <div style=\"margin-top:10px;display:flex;gap:8px\">
+  ${localStorage.getItem("hms_role") !== "student" ? `<button class="btn btn-success btn-sm" onclick="resolveComplaint(${c.complaint_id})">Mark Resolved</button>` : ""}
+  ${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteComplaint(${c.complaint_id})">Delete</button>` : ""}
+</div>
+    `;
+          open.appendChild(div);
+        });
+
+        resolvedItems.forEach((c) => {
+          const div = document.createElement("div");
+          div.className = "complaint-item resolved";
+          div.innerHTML = `
+      <div class="complaint-header">
+        <div class="complaint-title">${c.title}</div>
+        <span class="badge badge-resolved">resolved</span>
+      </div>
+      <div class="complaint-meta">👤 ${c.usn} · 🛏 ${c.room_no} · 🏷️ ${c.category}</div>
+      <div style=\"margin-top:8px\">
+  ${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteComplaint(${c.complaint_id})">Delete</button>` : ""}
+</div>
+    `;
+          resolved.appendChild(div);
+        });
+
+        if (openItems.length === 0)
+          open.innerHTML =
+            '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No open complaints 🎉</div>';
+        if (resolvedItems.length === 0)
+          resolved.innerHTML =
+            '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No resolved complaints yet</div>';
+      }
+
+      async function resolveComplaint(id) {
+        try {
+          await apiFetch("/complaints/" + id, {
+            method: "PUT",
+            body: JSON.stringify({ status: "resolved", priority: "Low" }),
+          });
+          showToast("✅ Complaint marked as resolved!");
+          allComplaints = [];
+          await loadComplaints();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function addComplaint() {
+        const usn = document.getElementById("c-usn").value.trim();
+        const room_no = document.getElementById("c-room").value.trim();
+        const category = document.getElementById("c-category").value;
+        const title = document.getElementById("c-title").value.trim();
+        const description = document.getElementById("c-desc").value.trim();
+        const priority = document.getElementById("c-priority").value;
+        if (!usn || !room_no || !title) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        try {
+          await apiFetch("/complaints", {
+            method: "POST",
+            body: JSON.stringify({
+              usn,
+              room_no,
+              category,
+              title,
+              description,
+              priority,
+            }),
+          });
+          showToast("✅ Complaint submitted!");
+          closeModal("add-complaint-modal");
+          ["c-usn", "c-room", "c-title", "c-desc"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          allComplaints = [];
+          await loadComplaints();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deleteComplaint(id) {
+        if (!confirm("Delete this complaint?")) return;
+        try {
+          await apiFetch("/complaints/" + id, { method: "DELETE" });
+          showToast("🗑️ Complaint deleted");
+          allComplaints = [];
+          await loadComplaints();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= VISITORS =========
+      async function loadVisitors() {
+        document.getElementById("visitors-loading").style.display = "flex";
+        const table = document.getElementById("visitor-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        try {
+          const _usn = localStorage.getItem("hms_usn");
+          allVisitors = await apiFetch(
+            _usn ? "/visitors?usn=" + _usn : "/visitors",
+          );
+          renderVisitors(allVisitors);
+          renderVisitorStats(allVisitors);
+          startVisitorTimers(allVisitors);
+        } catch (e) {
+          showToast("Failed to load visitors: " + e.message, true);
+        }
+        document.getElementById("visitors-loading").style.display = "none";
+      }
+
+      function renderVisitorStats(data) {
+        const inCount = data.filter((v) => v.status === "in").length;
+        const outCount = data.filter((v) => v.status === "out").length;
+        const today = new Date().toISOString().split("T")[0];
+        const todayCount = data.filter((v) =>
+          (v.visit_date || "").startsWith(today),
+        ).length;
+        document.getElementById("visitors-in").textContent = inCount;
+        document.getElementById("visitors-today").textContent = todayCount;
+        document.getElementById("visitors-total").textContent = data.length;
+        document.getElementById("visitors-out").textContent = outCount;
+      }
+
+      function renderVisitors(data) {
+        const table = document.getElementById("visitor-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        data.forEach((v, i) => {
+          const statusBadge =
+            v.status === "in" ? "badge-active" : "badge-inactive";
+          const row = table.insertRow();
+          const timerCell = v.status === "in"
+  ? `<td><span id="timer-${v.visitor_id}" style="font-weight:600"></span></td>`
+  : `<td style="color:var(--muted)">—</td>`;
+          row.innerHTML = `
+      <td><div style="display:flex;align-items:center"><div class="avatar" style="background:${getColor(i + 2)}">${initials(v.visitor_name)}</div>${v.visitor_name}</div></td>
+      <td style="font-size:12px;color:var(--muted)">${fmt(v.student_usn)}</td>
+      <td>${fmt(v.room_no)}</td>
+      <td>${fmt(v.purpose)}</td>
+      <td style="color:var(--success)">${fmt(v.in_time)}</td>
+      <td style="color:var(--muted)">${fmt(v.out_time)}</td>
+      ${timerCell}
+      <td><span class="badge ${statusBadge}">${v.status === "in" ? "Inside" : "Exited"}</span></td>
+      <td>${v.status === "in" ? `<button class="btn btn-outline btn-sm" onclick="logVisitorExit(${v.visitor_id})">Log Exit</button>` : `${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteVisitor(${v.visitor_id})">Delete</button>` : ""}`}</td>
+    `;
+        });
+      }
+      function startVisitorTimers(data) {
+  // Clear any existing timer
+  if (window._visitorTimerInterval) clearInterval(window._visitorTimerInterval);
+
+  window._visitorTimerInterval = setInterval(() => {
+    const now = new Date();
+    data.filter(v => v.status === "in").forEach(v => {
+      const el = document.getElementById("timer-" + v.visitor_id);
+      if (!el) return;
+
+     const [h, m, s] = (v.in_time || "00:00:00").split(":").map(Number);
+const inTime = new Date();
+inTime.setHours(h, m, s || 0, 0);
+
+// If inTime is in the future (clock skew), adjust
+if (inTime > now) inTime.setDate(inTime.getDate() - 1);
+
+const elapsedMs = now - inTime;
+const limitMs = (v.allowed_duration || 60) * 60000;
+const remainingMs = limitMs - elapsedMs;
+console.log(
+  v.visitor_name,
+  "| in_time:", v.in_time,
+  "| allowed_duration:", v.allowed_duration,
+  "| elapsed mins:", (elapsedMs / 60000).toFixed(2),
+  "| remaining mins:", (remainingMs / 60000).toFixed(2)
+);
+      if (remainingMs < 0) return;
+
+      if (remainingMs <= 0) {
+        el.textContent = "⛔ Expired";
+        el.style.color = "var(--danger)";
+      } else {
+        const remMins = Math.floor(remainingMs / 60000);
+        const remSecs = Math.floor((remainingMs % 60000) / 1000);
+        el.textContent = `${String(remMins).padStart(2,"0")}:${String(remSecs).padStart(2,"0")}`;
+        el.style.color = remainingMs < 300000 ? "var(--danger)" : "var(--success)";
+      }
+    });
+  }, 1000);
+}
+      function filterVisitors(q) {
+        const filtered = allVisitors.filter(
+          (v) =>
+            v.visitor_name.toLowerCase().includes(q.toLowerCase()) ||
+            (v.student_usn || "").toLowerCase().includes(q.toLowerCase()),
+        );
+        renderVisitors(filtered);
+      }
+
+      async function addVisitor() {
+        const visitor_name = document.getElementById("v-name").value.trim();
+        const visitor_mobile = document.getElementById("v-mobile").value.trim();
+        const student_usn = document.getElementById("v-usn").value.trim();
+        const room_no = document.getElementById("v-room").value.trim();
+        const purpose = document.getElementById("v-purpose").value;
+        const in_time = document.getElementById("v-intime").value;
+        const allowed_duration = parseInt(document.getElementById("v-duration").value) || 60;
+        if (!visitor_name || !student_usn || !room_no || !in_time) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        if (!/^\d{10}$/.test(visitor_mobile)) {
+          showToast("Visitor mobile must be 10 digits", true);
+          return;
+        }
+        try {
+          await apiFetch("/visitors", {
+            method: "POST",
+            body: JSON.stringify({
+              visitor_name,
+              visitor_mobile,
+              student_usn,
+              room_no,
+              purpose,
+              in_time,
+              allowed_duration,
+            }),
+          });
+          showToast("✅ Visitor logged in!");
+          closeModal("add-visitor-modal");
+          ["v-name", "v-mobile", "v-usn", "v-room", "v-intime"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          allVisitors = [];
+          await loadVisitors();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+        console.log("Duration being sent:", allowed_duration);
+      }
+
+      async function logVisitorExit(id) {
+        const now = new Date();
+        const out_time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+        try {
+          await apiFetch("/visitors/" + id, {
+            method: "PUT",
+            body: JSON.stringify({ out_time }),
+          });
+          showToast("🚪 Exit logged!");
+          allVisitors = [];
+          await loadVisitors();
+          await loadDashboard();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deleteVisitor(id) {
+        if (!confirm("Delete this visitor record?")) return;
+        try {
+          await apiFetch("/visitors/" + id, { method: "DELETE" });
+          showToast("🗑️ Visitor record deleted");
+          allVisitors = [];
+          await loadVisitors();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= STAFF =========
+      async function loadStaff() {
+        document.getElementById("staff-loading").style.display = "flex";
+        const table = document.getElementById("staff-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        try {
+          allStaff = await apiFetch("/staff");
+          document.getElementById("staff-count").textContent = allStaff.length;
+          allStaff.forEach((s, i) => {
+            const row = table.insertRow();
+            row.innerHTML = `
+        <td style="font-family:'Syne',sans-serif;font-size:12px">${s.staff_id}</td>
+        <td><div style="display:flex;align-items:center"><div class="avatar" style="background:${getColor(i)}">${initials(s.name)}</div>${s.name}</div></td>
+        <td><span class="badge badge-active">${s.role}</span></td>
+        <td>Block ${fmt(s.block_id)}</td>
+        <td style="color:var(--muted);font-size:12px">${fmt(s.email)}</td>
+        <td>${fmt(s.mobile)}</td>
+        <td>${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteStaff('${s.staff_id}')">Remove</button>` : ""}</td>
+      `;
+          });
+        } catch (e) {
+          showToast("Failed to load staff: " + e.message, true);
+        }
+        document.getElementById("staff-loading").style.display = "none";
+      }
+
+      async function addStaff() {
+        const staff_id = document.getElementById("st-id").value.trim();
+        const name = document.getElementById("st-name").value.trim();
+        const email = document.getElementById("st-email").value.trim();
+        const mobile = document.getElementById("st-mobile").value.trim();
+        const role = document.getElementById("st-role").value;
+        const block_id =
+          document.getElementById("st-block").value.trim() || null;
+        if (!staff_id || !name || !email || !mobile) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        try {
+          await apiFetch("/staff", {
+            method: "POST",
+            body: JSON.stringify({
+              staff_id,
+              name,
+              email,
+              mobile,
+              role,
+              block_id,
+            }),
+          });
+          showToast("✅ Staff added!");
+          closeModal("add-staff-modal");
+          ["st-id", "st-name", "st-email", "st-mobile", "st-block"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          allStaff = [];
+          await loadStaff();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deleteStaff(id) {
+        if (!confirm("Remove staff member?")) return;
+        try {
+          await apiFetch("/staff/" + id, { method: "DELETE" });
+          showToast("🗑️ Staff removed");
+          allStaff = [];
+          await loadStaff();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= BLOCKS =========
+      async function loadBlocks() {
+        document.getElementById("blocks-loading").style.display = "flex";
+        const table = document.getElementById("blocks-table");
+        while (table.rows.length > 1) table.deleteRow(1);
+        try {
+          allBlocks = await apiFetch("/blocks");
+          document.getElementById("blocks-count").textContent =
+            allBlocks.length;
+          allBlocks.forEach((b) => {
+            const row = table.insertRow();
+            row.innerHTML = `
+        <td style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px">${b.block_id}</td>
+        <td>${b.block_name}</td>
+        <td>${b.total_floors}</td>
+        <td>${b.total_rooms}</td>
+        <td>${localStorage.getItem("hms_role") === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteBlock('${b.block_id}')">Delete</button>` : ""}</td>
+      `;
+          });
+        } catch (e) {
+          showToast("Failed to load blocks: " + e.message, true);
+        }
+        document.getElementById("blocks-loading").style.display = "none";
+      }
+
+      async function addBlock() {
+        const block_id = document.getElementById("bl-id").value.trim();
+        const block_name = document.getElementById("bl-name").value.trim();
+        const total_floors = parseInt(
+          document.getElementById("bl-floors").value,
+        );
+        const total_rooms = parseInt(document.getElementById("bl-rooms").value);
+        if (
+          !block_id ||
+          !block_name ||
+          isNaN(total_floors) ||
+          isNaN(total_rooms)
+        ) {
+          showToast("Please fill all required fields", true);
+          return;
+        }
+        try {
+          await apiFetch("/blocks", {
+            method: "POST",
+            body: JSON.stringify({
+              block_id,
+              block_name,
+              total_floors,
+              total_rooms,
+            }),
+          });
+          showToast("✅ Block added!");
+          closeModal("add-block-modal");
+          ["bl-id", "bl-name", "bl-floors", "bl-rooms"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          allBlocks = [];
+          await loadBlocks();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      async function deleteBlock(id) {
+        if (
+          !confirm(
+            `Delete block ${id}? This will affect all rooms in this block.`,
+          )
+        )
+          return;
+        try {
+          await apiFetch("/blocks/" + id, { method: "DELETE" });
+          showToast("🗑️ Block deleted");
+          allBlocks = [];
+          await loadBlocks();
+        } catch (e) {
+          showToast("Error: " + e.message, true);
+        }
+      }
+
+      // ========= FEE CHART =========
+      function renderFeeChart(paymentsData) {
+        const chart = document.getElementById("feeChart");
+        const labels = document.getElementById("feeLabels");
+        chart.innerHTML = "";
+        labels.innerHTML = "";
+
+        if (!paymentsData || paymentsData.length === 0) {
+          const months = [
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+            "Jan",
+            "Feb",
+            "Mar",
+          ];
+          const fakeCollected = [85, 78, 92, 88, 95, 82, 90, 87];
+          months.forEach((m, i) => {
+            const wrap = document.createElement("div");
+            wrap.style.cssText =
+              "flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%";
+            const b = document.createElement("div");
+            b.className = "bar";
+            b.style.cssText = `height:${fakeCollected[i]}%;background:linear-gradient(to top,var(--accent3),rgba(0,229,189,0.5));`;
+            wrap.appendChild(b);
+            chart.appendChild(wrap);
+            const lb = document.createElement("div");
+            lb.className = "chart-label";
+            lb.textContent = m;
+            labels.appendChild(lb);
+          });
+          return;
+        }
+
+        // Group by month
+        const byMonth = {};
+        paymentsData.forEach((p) => {
+          const key = (p.month || "").substring(0, 7) || "Unknown";
+          if (!byMonth[key]) byMonth[key] = { paid: 0, total: 0 };
+          byMonth[key].total++;
+          if (p.status === "paid") byMonth[key].paid++;
+        });
+        const keys = Object.keys(byMonth).slice(-9);
+        const maxVal = Math.max(...keys.map((k) => byMonth[k].total), 1);
+        keys.forEach((k) => {
+          const d = byMonth[k];
+          const pct = Math.round((d.paid / maxVal) * 100);
+          const wrap = document.createElement("div");
+          wrap.style.cssText =
+            "flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%";
+          const b = document.createElement("div");
+          b.className = "bar";
+          b.style.cssText = `height:${pct}%;background:linear-gradient(to top,var(--accent3),rgba(0,229,189,0.5));`;
+          b.title = `${d.paid}/${d.total} paid`;
+          wrap.appendChild(b);
+          chart.appendChild(wrap);
+          const lb = document.createElement("div");
+          lb.className = "chart-label";
+          lb.textContent = k.substring(5);
+          labels.appendChild(lb);
+        });
+      }
+
+      // ========= DASHBOARD =========
+      async function loadDashboard() {
+        try {
+          const role = localStorage.getItem("hms_role");
+          const usn = localStorage.getItem("hms_usn");
+
+          // ── Student dashboard ──────────────────────────────────────
+          if (role === "student" && usn) {
+            const [payments, complaints, visitors, students] =
+              await Promise.all([
+                apiFetch("/payments?usn=" + usn),
+                apiFetch("/complaints?usn=" + usn),
+                apiFetch("/visitors?usn=" + usn),
+                apiFetch("/students"),
+              ]);
+            allPayments = payments;
+            allComplaints = complaints;
+            allVisitors = visitors;
+
+            const me = students.find((s) => s.usn === usn) || {};
+
+            document.getElementById("dash-total-students").textContent =
+              me.room_no || "—";
+            document
+              .getElementById("dash-total-students")
+              .closest(".stat-card")
+              .querySelector(".stat-label").textContent = "My Room";
+            document
+              .getElementById("dash-total-students")
+              .closest(".stat-card")
+              .querySelector(".stat-icon").textContent = "🛏️";
+
+            document.getElementById("dash-occupied-rooms").textContent =
+              me.fee_status || "—";
+            document
+              .getElementById("dash-occupied-rooms")
+              .closest(".stat-card")
+              .querySelector(".stat-label").textContent = "Fee Status";
+            document
+              .getElementById("dash-occupied-rooms")
+              .closest(".stat-card")
+              .querySelector(".stat-icon").textContent = "💰";
+            document.getElementById("room-progress").style.width =
+              me.fee_status === "paid" ? "100%" : "30%";
+
+            const myOpenComplaints = complaints.filter(
+              (c) => c.status !== "resolved",
+            ).length;
+            document.getElementById("dash-open-complaints").textContent =
+              myOpenComplaints;
+            document
+              .getElementById("dash-open-complaints")
+              .closest(".stat-card")
+              .querySelector(".stat-label").textContent = "My Open Complaints";
+
+            const myPendingPayments = payments.filter(
+              (p) => p.status !== "paid",
+            ).length;
+            document.getElementById("dash-fees-collected").textContent =
+              myPendingPayments;
+            document
+              .getElementById("dash-fees-collected")
+              .closest(".stat-card")
+              .querySelector(".stat-label").textContent = "Pending Payments";
+            document
+              .getElementById("dash-fees-collected")
+              .closest(".stat-card")
+              .querySelector(".stat-icon").textContent = "⚠️";
+
+            // Hide irrelevant dashboard sections
+            const feeChart = document.querySelector("#feeChart");
+            if (feeChart) feeChart.closest(".card").style.display = "none";
+            const recentStudents = document.getElementById(
+              "dash-recent-students",
+            );
+            if (recentStudents)
+              recentStudents.closest(".card").style.display = "none";
+
+            // Show my visitors
+            const visitorEl = document.getElementById("dashboard-visitors");
+            const myActiveVisitors = visitors.filter((v) => v.status === "in");
+            visitorEl.innerHTML = myActiveVisitors.length
+              ? myActiveVisitors
+                  .map(
+                    (v) => `
+            <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+              <strong>${v.visitor_name}</strong> — ${v.purpose}
+              <span style="float:right;color:var(--muted)">${v.in_time}</span>
+            </div>`,
+                  )
+                  .join("")
+              : "<p style='color:var(--muted);padding:12px'>No active visitors</p>";
+            // Student-specific alerts
+            const dashAlerts = document.getElementById("dash-alerts");
+            dashAlerts.innerHTML = "";
+            // Check overdue visitors and auto-exit them
+        const now = new Date();
+          for (const v of visitors.filter(v => v.status === "in")) {
+  const [h, m, s] = (v.in_time || "00:00:00").split(":").map(Number);
+  const inTime = new Date();
+  inTime.setHours(h, m, s || 0, 0);
+  const minutesInside = (now - inTime) / 60000;
+  if (minutesInside > (v.allowed_duration || 60)) {
+    // Auto-exit
+    const out = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
+    apiFetch("/visitors/" + v.visitor_id, {
+      method: "PUT",
+      body: JSON.stringify({ out_time: out }),
+    }).then(() => {
+      showToast(`⏰ ${v.visitor_name} auto-exited (time limit exceeded)`, true);
+    });
+    dashAlerts.innerHTML += `<div class="alert alert-warning"><div class="alert-icon">⏰</div><div class="alert-text"><strong>${v.visitor_name} exceeded time limit</strong>Was allowed ${v.allowed_duration} min, auto-marked as exited.</div></div>`;
+  }
+}
+
+            const myUnpaid = payments.filter((p) => p.status !== "paid");
+            if (myUnpaid.length > 0)
+              dashAlerts.innerHTML += `<div class="alert alert-warning"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>${myUnpaid.length} Pending/Unpaid Payment(s)</strong>Please clear your dues before the due date.</div></div>`;
+
+            const myHighComplaints = complaints.filter(
+              (c) => c.priority === "High" && c.status !== "resolved",
+            );
+            if (myHighComplaints.length > 0)
+              dashAlerts.innerHTML += `<div class="alert alert-warning"><div class="alert-icon">🔧</div><div class="alert-text"><strong>${myHighComplaints.length} High Priority Complaint(s)</strong>Your complaints are being reviewed.</div></div>`;
+
+            const myResolved = complaints.filter(
+              (c) => c.status === "resolved",
+            );
+            if (myResolved.length > 0)
+              dashAlerts.innerHTML += `<div class="alert alert-info"><div class="alert-icon">✅</div><div class="alert-text"><strong>${myResolved.length} Complaint(s) Resolved</strong>Your complaints have been addressed.</div></div>`;
+
+            if (dashAlerts.innerHTML === "")
+              dashAlerts.innerHTML =
+                '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">All clear! No alerts.</div>';
+
+            return;
+          }
+
+          // ── Admin dashboard ────────────────────────────────────────
+          const [students, rooms, payments, complaints, visitors] =
+            await Promise.all([
+              apiFetch("/students"),
+              apiFetch("/rooms"),
+              apiFetch("/payments"),
+              apiFetch("/complaints"),
+              apiFetch("/visitors"),
+            ]);
+
+          // Update state
+          allStudents = students;
+          allRooms = rooms;
+          allPayments = payments;
+          allComplaints = complaints;
+          allVisitors = visitors;
+
+          // Stat cards
+          document.getElementById("dash-total-students").textContent =
+            students.length;
+          document.getElementById("students-badge").textContent =
+            students.length;
+
+          const occupied = rooms.filter((r) => r.status === "occupied").length;
+          const totalR = rooms.length;
+          document.getElementById("dash-occupied-rooms").textContent = occupied;
+          document.getElementById("room-progress").style.width = totalR
+            ? Math.round((occupied / totalR) * 100) + "%"
+            : "0%";
+
+          const paidStudents = students.filter(
+            (s) => s.fee_status === "paid",
+          ).length;
+          document.getElementById("dash-fees-collected").textContent =
+            paidStudents;
+
+          const openComplaints = complaints.filter(
+            (c) => c.status !== "resolved",
+          ).length;
+          document.getElementById("dash-open-complaints").textContent =
+            openComplaints;
+          document.getElementById("complaints-badge").textContent =
+            openComplaints;
+
+          const pendingPayments = payments.filter(
+            (p) => p.status !== "paid",
+          ).length;
+          document.getElementById("payments-badge").textContent =
+            pendingPayments;
+
+          // Recent students table
+          const dashRecent = document.getElementById("dash-recent-students");
+          dashRecent.innerHTML = "";
+          const table = document.createElement("table");
+          students.slice(0, 5).forEach((s, i) => {
+            const badge =
+              s.fee_status === "paid"
+                ? "badge-paid"
+                : s.fee_status === "unpaid"
+                  ? "badge-unpaid"
+                  : "badge-pending";
+            const row = table.insertRow();
+            row.innerHTML = `
+        <td><div style="display:flex;align-items:center">
+          <div class="avatar" style="background:${getColor(i)}">${initials(s.name)}</div>
+          <div><div style="font-weight:500;font-size:13px">${s.name}</div><div style="font-size:11px;color:var(--muted)">${s.usn}</div></div>
+        </div></td>
+        <td>${fmt(s.room_no)}</td>
+        <td><span class="badge ${badge}">${s.fee_status || "pending"}</span></td>
+      `;
+          });
+          dashRecent.appendChild(table);
+
+          // Fee chart
+          renderFeeChart(payments);
+
+          // Active visitors
+          const activeVis = visitors.filter((v) => v.status === "in");
+          document.getElementById("active-visitors-count").textContent =
+            activeVis.length + " In";
+          const dashVis = document.getElementById("dashboard-visitors");
+          dashVis.innerHTML = "";
+          if (activeVis.length === 0) {
+            dashVis.innerHTML =
+              '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No active visitors</div>';
+          } else {
+            activeVis.forEach((v, i) => {
+              const div = document.createElement("div");
+              div.className = "visitor-entry";
+              div.innerHTML = `
+          <div class="avatar" style="background:${getColor(i + 3)}">${initials(v.visitor_name)}</div>
+          <div class="visitor-info">
+            <div class="visitor-name">${v.visitor_name}</div>
+            <div class="visitor-meta">Visiting ${v.student_usn} · Room ${v.room_no} · In at ${v.in_time}</div>
+          </div>
+          <span class="badge badge-active">In</span>
+        `;
+              dashVis.appendChild(div);
+            });
+          }
+
+          // Alerts
+          const dashAlerts = document.getElementById("dash-alerts");
+          dashAlerts.innerHTML = "";
+          const unpaidCount = payments.filter(
+            (p) => p.status === "unpaid",
+          ).length;
+          if (unpaidCount > 0) {
+            dashAlerts.innerHTML += `<div class="alert alert-warning"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>${unpaidCount} Unpaid Fee Record(s)</strong>Some students have overdue payments. Follow up required.</div></div>`;
+          }
+          const highComplaints = complaints.filter(
+            (c) => c.priority === "High" && c.status !== "resolved",
+          ).length;
+          if (highComplaints > 0) {
+            dashAlerts.innerHTML += `<div class="alert alert-warning"><div class="alert-icon">🔧</div><div class="alert-text"><strong>${highComplaints} High Priority Complaint(s)</strong>These need urgent attention.</div></div>`;
+          }
+          const maintRooms = rooms.filter(
+            (r) => r.status === "maintenance",
+          ).length;
+          if (maintRooms > 0) {
+            dashAlerts.innerHTML += `<div class="alert alert-info"><div class="alert-icon">🛠️</div><div class="alert-text"><strong>${maintRooms} Room(s) Under Maintenance</strong>These rooms are not available for allocation.</div></div>`;
+          }
+          const availRooms = rooms.filter(
+            (r) => r.status === "available",
+          ).length;
+          if (availRooms > 0) {
+            dashAlerts.innerHTML += `<div class="alert alert-info"><div class="alert-icon">✅</div><div class="alert-text"><strong>${availRooms} Room(s) Available</strong>Ready for new student allocation.</div></div>`;
+          }
+          // Check overdue visitors and auto-exit them
+const now = new Date();
+for (const v of visitors.filter(v => v.status === "in")) {
+  const [h, m, s] = (v.in_time || "00:00:00").split(":").map(Number);
+  const inTime = new Date();
+  inTime.setHours(h, m, s || 0, 0);
+  if (inTime > now) inTime.setDate(inTime.getDate() - 1);
+  const minutesInside = (now - inTime) / 60000;
+  if (minutesInside > (v.allowed_duration || 60)) {
+    const out = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
+    apiFetch("/visitors/" + v.visitor_id, {
+      method: "PUT",
+      body: JSON.stringify({ out_time: out }),
+    }).then(() => {
+      showToast(`⏰ ${v.visitor_name} auto-exited (time limit exceeded)`, true);
+    });
+    dashAlerts.innerHTML += `<div class="alert alert-warning"><div class="alert-icon">⏰</div><div class="alert-text"><strong>${v.visitor_name} exceeded time limit</strong>Allowed ${v.allowed_duration} min — auto-marked as exited.</div></div>`;
+  }
+}
+
+          if (dashAlerts.innerHTML === "") {
+            dashAlerts.innerHTML =
+              '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">All clear! No alerts.</div>';
+          }
+        } catch (e) {
+          showToast(
+            "Could not connect to server. Make sure backend is running on port 5000.",
+            true,
+          );
+          document.getElementById("dashboard-visitors").innerHTML =
+            `<div class="error-state"><div class="error-icon">🔌</div><div>Backend offline</div><div style="font-size:12px;color:var(--muted);margin-top:4px">Run <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">node app.js</code> in the backend folder</div></div>`;
+          document.getElementById("dash-alerts").innerHTML =
+            `<div class="alert alert-warning"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>Backend Not Connected</strong>Start the server: node app.js in the hostel-backend folder</div></div>`;
+        }
+      }
+
+      function refreshAll() {
+        allStudents = [];
+        allRooms = [];
+        allPayments = [];
+        allComplaints = [];
+        allVisitors = [];
+        allStaff = [];
+        allBlocks = [];
+        loadDashboard();
+        showToast("🔄 Data refreshed!");
+      }
+
+      // ========= AUTH =========
+      function doLogin() {
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value;
+        const errEl = document.getElementById("login-error");
+        errEl.textContent = "";
+        if (!email || !password) {
+          errEl.textContent = "Please enter email and password.";
+          return;
+        }
+        fetch(API + "/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.error) {
+              errEl.textContent = data.error;
+              return;
+            }
+            localStorage.setItem("hms_token", data.token);
+            localStorage.setItem("hms_name", data.name);
+            localStorage.setItem("hms_role", data.role);
+            if (data.usn) localStorage.setItem("hms_usn", data.usn);
+            initApp(data.name, data.role);
+          })
+          .catch(() => {
+            errEl.textContent = "Cannot connect to server. Is it running?";
+          });
+      }
+
+      function doLogout() {
+        localStorage.removeItem("hms_token");
+        localStorage.removeItem("hms_name");
+        localStorage.removeItem("hms_role");
+        localStorage.removeItem("hms_usn");
+        document.getElementById("login-page").classList.remove("hidden");
+        document.getElementById("login-email").value = "";
+        document.getElementById("login-password").value = "";
+        document.getElementById("login-error").textContent = "";
+      }
+
+      function initApp(name, role) {
+        document.getElementById("login-page").classList.add("hidden");
+        // Set user info in sidebar
+        document.getElementById("sidebar-username").textContent = name;
+        const roleBadge = document.getElementById("sidebar-role");
+        roleBadge.textContent = role;
+        roleBadge.className = "role-badge " + role;
+        // Show admin-only elements
+        if (role === "admin") {
+          document
+            .querySelectorAll(".admin-only")
+            .forEach((el) => (el.style.display = "flex"));
+          document
+            .querySelectorAll(".btn-danger")
+            .forEach((el) => (el.style.display = "inline-flex"));
+        } else if (role === "student") {
+          // Hide nav items not relevant to students
+          document.querySelectorAll(".nav-item").forEach((el) => {
+            const text = el.textContent.trim();
+            if (
+              [
+                "Rooms",
+                "Blocks",
+                "Staff",
+                "Students",
+                "Refresh",
+                "User",
+                "Management",
+              ].some((t) => text.includes(t))
+            )
+              el.style.display = "none";
+          });
+          // Hide all add/delete buttons
+          document
+            .querySelectorAll(".btn-danger, .btn-primary")
+            .forEach((el) => {
+              const onclick = el.getAttribute("onclick") || "";
+              if (
+                !onclick.includes("complaint") &&
+                !onclick.includes("visitor")
+              )
+                el.style.display = "none";
+            });
+          // Auto-fill and lock USN fields
+          const _studentUsn = localStorage.getItem("hms_usn");
+          if (_studentUsn) {
+            const cUsn = document.getElementById("c-usn");
+            const vUsn = document.getElementById("v-usn");
+            if (cUsn) {
+              cUsn.value = _studentUsn;
+              cUsn.readOnly = true;
+            }
+            if (vUsn) {
+              vUsn.value = _studentUsn;
+              vUsn.readOnly = true;
+            }
+          }
+        } else {
+          document
+            .querySelectorAll(".btn-danger")
+            .forEach((el) => (el.style.display = "none"));
+          document
+            .querySelectorAll(".btn-primary")
+            .forEach((el) => (el.style.display = "none"));
+        }
+        loadDashboard();
+        const now = new Date();
+        const vtIntime = document.getElementById("v-intime");
+if (vtIntime) vtIntime.value =
+  `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+const vtInseconds = document.getElementById("v-inseconds");
+if (vtInseconds) vtInseconds.value = String(now.getSeconds()).padStart(2, "0");
+        // Auto-fill USN fields for student login
+        const _studentUsn = localStorage.getItem("hms_usn");
+        if (_studentUsn) {
+          const cUsn = document.getElementById("c-usn");
+          const vUsn = document.getElementById("v-usn");
+          if (cUsn) {
+            cUsn.value = _studentUsn;
+            cUsn.readOnly = true;
+          }
+          if (vUsn) {
+            vUsn.value = _studentUsn;
+            vUsn.readOnly = true;
+          }
+        }
+      }
+
+      // ── Users management (admin only) ────────────────────────────
+      async function loadUsers() {
+        try {
+          const data = await apiFetch("/auth/users");
+          const tbody = document.getElementById("users-tbody");
+          if (!data.length) {
+            tbody.innerHTML =
+              '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No users found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data
+            .map(
+              (u) => `
+            <tr>
+              <td><strong>${u.name}</strong></td>
+              <td>${u.email}</td>
+              <td><span class="role-badge ${u.role}">${u.role}</span></td>
+              <td>${new Date(u.created_at).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-danger btn-sm delete-btn" onclick="deleteUser(${u.id}, '${u.name}')">Remove</button>
+              </td>
+            </tr>
+          `,
+            )
+            .join("");
+        } catch (e) {
+          showToast("Failed to load users", "error");
+        }
+      }
+
+      async function addUser() {
+        const name = document.getElementById("u-name").value.trim();
+        const email = document.getElementById("u-email").value.trim();
+        const password = document.getElementById("u-password").value;
+        const role = document.getElementById("u-role").value;
+        if (!name || !email || !password)
+          return showToast("All fields are required", "error");
+        if (password.length < 6)
+          return showToast("Password must be at least 6 characters", "error");
+        try {
+          await apiFetch("/auth/create-user", {
+            method: "POST",
+            body: JSON.stringify({ name, email, password, role }),
+          });
+          closeModal("add-user-modal");
+          showToast("User account created successfully!");
+          loadUsers();
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
+
+      async function deleteUser(id, name) {
+        if (!confirm(`Remove account for ${name}?`)) return;
+        try {
+          await apiFetch("/auth/users/" + id, { method: "DELETE" });
+          showToast("User account removed.");
+          loadUsers();
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
+
+      // ========= INIT =========
+      window.onload = () => {
+  const token = localStorage.getItem("hms_token");
+  const name = localStorage.getItem("hms_name");
+  const role = localStorage.getItem("hms_role");
+  if (token && name && role) {
+    fetch(API + "/auth/me", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(() => initApp(name, role))
+      .catch((err) => {
+  console.log("Auth check failed:", err);
+  doLogout();
+});
+  }
+  // Auto-check visitor time limits every 60 seconds
+  // Auto-check visitor time limits every 60 seconds
+setTimeout(() => {
+  setInterval(() => {
+    const token = localStorage.getItem("hms_token");
+    if (token && document.getElementById("login-page").classList.contains("hidden")) {
+      loadDashboard();
+    }
+  }, 60000);
+}, 10000);
+};
+    </script>
+  </body>
+</html>
